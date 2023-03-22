@@ -1,0 +1,23 @@
+springdoc:
+  swagger-ui:
+    operationsSorter: "method"
+feign:
+  jira:
+    url: "http://localhost:8081/tickets/jira"
+spring:
+  datasource:
+    driver-class-name: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432/Jira"
+    username: "${DB_LOGIN:root}"
+    password: "${DB_PASSWORD:root}"
+  #  jpa:
+  #    show-sql: false
+  #  freemarker:
+  #    expose-request-attributes: true
+  flyway:
+    locations: "classpath:migration"
+#  mvc:
+#    pathmatch:
+#      matching-strategy: "ANT_PATH_MATCHER"
+#  main:
+#    allow-circular-references: true
