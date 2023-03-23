@@ -70,7 +70,7 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     }
 
     @Override
-    public IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code) {
+    public IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code) { //todo Сделать так чтобы при отписке удалялись объекты без связей
         Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
         IssueInfo issueInfo = chat.getSubscribeIssues()
                 .stream()
