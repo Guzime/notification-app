@@ -2,6 +2,8 @@ package ru.filit.notificationapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import ru.filit.notificationapp.type.ChatStatus;
+import ru.filit.notificationapp.type.ChatType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,8 +23,10 @@ public class Chat {
     private Long id;
     private String title;
     private Long telegramId;
-    private String type;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ChatType type;
+    @Enumerated(EnumType.STRING)
+    private ChatStatus status;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
     @Builder.Default
