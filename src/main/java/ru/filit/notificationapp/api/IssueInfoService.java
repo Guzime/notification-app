@@ -14,6 +14,8 @@ public interface IssueInfoService {
 
     IssueInfoDto subscribeIssueInfoToChat(Long telegramId, String code);
 
+    IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code);
+
     ChatDto removeIssueForChat(Long telegramId, String code);
 
     IssueInfoDto deleteIssueInfoById(Long issueId);

@@ -17,8 +17,6 @@ import ru.filit.notificationapp.repository.ChatRepository;
 import ru.filit.notificationapp.repository.IssueRepository;
 import ru.filit.notificationapp.support.JiraParser;
 
-import java.util.stream.Collectors;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -62,12 +60,26 @@ public class IssueInfoServiceImpl implements IssueInfoService {
         Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
         log.info("Get ticket by code");
         JiraIssueInfoResponse jiraIssueInfoResponse = jiraService.findTicketInfo(code);
-        IssueInfo issueInfo = jiraParser.makeIssueInfoFromJiraIssueInfoResponse(jiraIssueInfoResponse);
+        IssueInfo issueInfo = issueRepository.findByCode(code).orElse(jiraParser.makeIssueInfoFromJiraIssueInfoResponse(jiraIssueInfoResponse));
         if (chat.getSubscribeIssues().stream().noneMatch(issue -> issueInfo.getCode().equals(issue.getCode()))) {
             log.info("Save issue for chat");
             chat.getSubscribeIssues().add(issueInfo);
             chatRepository.save(chat);
         }
+        return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
+    }
+
+    @Override
+    public IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code) {
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
+        log.info("Save issue for chat");
+        IssueInfo issueInfo = chat.getSubscribeIssues()
+                .stream()
+                .filter(issue -> code.equals(issue.getCode()))
+                .findFirst()
+                .orElseThrow(() -> new CustomException("Such Issue is not found in this chat"));
+        chat.getSubscribeIssues().remove(issueInfo);
+        chatRepository.save(chat);
         return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
     }
 
