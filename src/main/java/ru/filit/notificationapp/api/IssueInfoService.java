@@ -10,7 +10,9 @@ public interface IssueInfoService {
 
     IssueInfoDto saveIssueInfo(IssueInfoDto issueInfoDto);
 
-    ChatDto saveIssueInfoForTelegram(Long telegramId, IssueInfoDto issueInfoDto);
+    ChatDto saveIssueInfoToChat(Long telegramId, IssueInfoDto issueInfoDto);
+
+    IssueInfoDto subscribeIssueInfoToChat(Long telegramId, String code);
 
     ChatDto removeIssueForChat(Long telegramId, String code);
 

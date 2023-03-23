@@ -4,15 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.filit.notificationapp.api.IssueInfoService;
+import ru.filit.notificationapp.api.JiraService;
 import ru.filit.notificationapp.dto.ChatDto;
 import ru.filit.notificationapp.dto.IssueInfoDto;
 import ru.filit.notificationapp.entity.Chat;
 import ru.filit.notificationapp.entity.IssueInfo;
+import ru.filit.notificationapp.entity.jira.JiraIssueInfoResponse;
 import ru.filit.notificationapp.exception.CustomException;
 import ru.filit.notificationapp.mapper.ChatDtoMapper;
 import ru.filit.notificationapp.mapper.IssueInfoDtoMapper;
 import ru.filit.notificationapp.repository.ChatRepository;
 import ru.filit.notificationapp.repository.IssueRepository;
+import ru.filit.notificationapp.support.JiraParser;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +28,8 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     private final IssueInfoDtoMapper issueInfoDtoMapper;
     private final ChatDtoMapper chatDtoMapper;
     private final ChatRepository chatRepository;
+    private final JiraService jiraService;
+    private final JiraParser jiraParser;
 
     @Override
     public IssueInfoDto getIssueInfoById(Long issueId) {
@@ -43,11 +50,25 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     }
 
     @Override
-    public ChatDto saveIssueInfoForTelegram(Long telegramId, IssueInfoDto issueInfoDto) {
+    public ChatDto saveIssueInfoToChat(Long telegramId, IssueInfoDto issueInfoDto) {
         Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
         log.info("Add IssueInfo to chat");
         chat.getSubscribeIssues().add(issueInfoDtoMapper.toIssueInfo(issueInfoDto));
         return chatDtoMapper.toChatDto(chatRepository.save(chat));
+    }
+
+    @Override
+    public IssueInfoDto subscribeIssueInfoToChat(Long telegramId, String code) {
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
+        log.info("Get ticket by code");
+        JiraIssueInfoResponse jiraIssueInfoResponse = jiraService.findTicketInfo(code);
+        IssueInfo issueInfo = jiraParser.makeIssueInfoFromJiraIssueInfoResponse(jiraIssueInfoResponse);
+        if (chat.getSubscribeIssues().stream().noneMatch(issue -> issueInfo.getCode().equals(issue.getCode()))) {
+            log.info("Save issue for chat");
+            chat.getSubscribeIssues().add(issueInfo);
+            chatRepository.save(chat);
+        }
+        return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
     }
 
     @Override

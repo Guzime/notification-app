@@ -44,7 +44,14 @@ public class IssueInfoController {
     @Operation(summary = "Save Issue for chat")
     public ResponseEntity<ChatDto> saveIssueForChat(@PathVariable("telegramId") Long telegramId, @RequestBody IssueInfoDto issueInfoDto) {
         log.info("Save Issue for telegram");
-        return ResponseEntity.ok(issueInfoService.saveIssueInfoForTelegram(telegramId, issueInfoDto));
+        return ResponseEntity.ok(issueInfoService.saveIssueInfoToChat(telegramId, issueInfoDto));
+    }
+
+    @PutMapping("/subscribe/{telegramId}/{code}")
+    @Operation(summary = "Subscribe Issue to chat")
+    public ResponseEntity<IssueInfoDto> subscribeIssueToChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
+        log.info("Subscribe Issue to chat");
+        return ResponseEntity.ok(issueInfoService.subscribeIssueInfoToChat(telegramId, code));
     }
 
     @DeleteMapping("/telegram/{telegramId}/{code}")

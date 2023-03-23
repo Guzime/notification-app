@@ -12,6 +12,7 @@ import ru.filit.notificationapp.entity.jira.JiraIssueInfoResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
@@ -23,13 +24,26 @@ public class JiraParser {
     public IssueInfo makeIssueInfoFromJiraIssueInfoResponse(JiraIssueInfoResponse jiraIssueInfoResponse) {
         String title = jiraIssueInfoResponse.getFields().getSummary();
         String code = jiraIssueInfoResponse.getKey();
-        String status = jiraIssueInfoResponse.getFields().getResolution().getName();
+        String status = jiraIssueInfoResponse.getFields().getStatus().getName();
         String description = jiraIssueInfoResponse.getFields().getDescription();
+        List<Comment> comments = jiraIssueInfoResponse.getFields().getComments().getComments();
+        List<CommentInfo> commentResults = new LinkedList<>();
+        for (Comment comment : comments) {
+            commentResults.add(CommentInfo
+                    .builder()
+                    .author(comment.getAuthor().getDisplayName())
+                    .jiraId(Long.valueOf(comment.getId()))
+                    .description(comment.getBody())
+                    .createdDate(LocalDateTime.now())
+                    .updatedDate(LocalDateTime.now())
+                    .build());
+        }
         return IssueInfo.builder()
                 .title(title)
                 .code(code)
                 .status(status)
                 .description(description)
+                .comments(commentResults)
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();
