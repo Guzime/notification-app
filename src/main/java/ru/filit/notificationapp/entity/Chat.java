@@ -31,7 +31,7 @@ public class Chat {
     private LocalDateTime updatedDate;
     @Builder.Default
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "issue_chat",
             schema = "jira",
             joinColumns = @JoinColumn(name = "chat_id"),

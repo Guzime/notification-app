@@ -72,7 +72,6 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     @Override
     public IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code) {
         Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
-        log.info("Save issue for chat");
         IssueInfo issueInfo = chat.getSubscribeIssues()
                 .stream()
                 .filter(issue -> code.equals(issue.getCode()))
