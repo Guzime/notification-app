@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.filit.notificationapp.api.IssueInfoService;
 import ru.filit.notificationapp.dto.ChatDto;
 import ru.filit.notificationapp.dto.IssueInfoDto;
+import ru.filit.notificationapp.service.NotificationSchedulerImpl;
 
 @Slf4j
 @RestController
@@ -18,6 +19,7 @@ import ru.filit.notificationapp.dto.IssueInfoDto;
 public class IssueInfoController {
 
     final private IssueInfoService issueInfoService;
+    final private NotificationSchedulerImpl notificationScheduler;
 
     @GetMapping("/{id}")
     @Operation(summary = "Get issue by Id")
@@ -30,6 +32,7 @@ public class IssueInfoController {
     @Operation(summary = "Get issue bu Code")
     public ResponseEntity<IssueInfoDto> getIssueInfoByCode(@PathVariable("code") String code) {
         log.info("Get issue by code = {}", code);
+        notificationScheduler.scheduleFixedDelayTask();
         return ResponseEntity.ok(issueInfoService.getIssueInfoByCode(code));
     }
 

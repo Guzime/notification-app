@@ -5,7 +5,7 @@ import ru.filit.notificationapp.type.ChatStatus;
 import ru.filit.notificationapp.type.ChatType;
 
 @Builder
-public record ChatDto(Long id,
+public record ChatDto(
                       String title,
                       Long telegramId,
                       ChatType type,

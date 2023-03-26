@@ -11,7 +11,6 @@ public class ChatDtoMapper {
 
     public ChatDto toChatDto(Chat chat) {
         return ChatDto.builder()
-                .id(chat.getId())
                 .title(chat.getTitle())
                 .type(chat.getType())
                 .telegramId(chat.getTelegramId())
@@ -21,7 +20,6 @@ public class ChatDtoMapper {
 
     public Chat toChat(ChatDto chatDto) {
         return Chat.builder()
-                .id(chatDto.id())
                 .title(chatDto.title())
                 .type(chatDto.type())
                 .status(chatDto.status())
