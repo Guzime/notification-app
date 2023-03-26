@@ -50,14 +50,14 @@ public class IssueInfoController {
         return ResponseEntity.ok(issueInfoService.saveIssueInfoToChat(telegramId, issueInfoDto));
     }
 
-    @PutMapping("/subscribe/{telegramId}/{code}")
+    @PatchMapping("/subscribe/{telegramId}/{code}")
     @Operation(summary = "Subscribe Issue to chat")
     public ResponseEntity<IssueInfoDto> subscribeIssueToChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
         log.info("Subscribe Issue to chat");
         return ResponseEntity.ok(issueInfoService.subscribeIssueInfoToChat(telegramId, code));
     }
 
-    @DeleteMapping("/subscribe/{telegramId}/{code}")
+    @DeleteMapping("/unsubscribe/{telegramId}/{code}")
     @Operation(summary = "Unsubscribe Issue from chat")
     public ResponseEntity<IssueInfoDto> unsubscribeIssueFromChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
         log.info("Unsubscribe Issue from chat");

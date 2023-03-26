@@ -2,6 +2,7 @@ package ru.filit.notificationapp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.filit.notificationapp.api.ChatService;
@@ -10,6 +11,8 @@ import ru.filit.notificationapp.entity.Chat;
 import ru.filit.notificationapp.exception.CustomException;
 import ru.filit.notificationapp.mapper.ChatDtoMapper;
 import ru.filit.notificationapp.repository.ChatRepository;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +36,18 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatDto saveChat(ChatDto chatDto) {
-        Chat chat = chatRepository.save(chatDtoMapper.toChat(chatDto));
+        Chat chatFromDb = chatRepository.findByTelegramId(chatDto.telegramId()).orElse(null);
+        Chat chat;
+        if (chatFromDb == null) {
+            chat = chatRepository.save(chatDtoMapper.toChat(chatDto));
+        } else {
+            chat = chatRepository.save(chatFromDb.toBuilder()
+                    .title(chatDto.title())
+                    .status(chatDto.status())
+                    .type(chatDto.type())
+                    .updatedDate(LocalDateTime.now())
+                    .build());
+        }
         return chatDtoMapper.toChatDto(chat);
     }
 

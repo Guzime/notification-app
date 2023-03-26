@@ -2,7 +2,9 @@ package ru.filit.notificationapp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.filit.notificationapp.api.IssueInfoService;
 import ru.filit.notificationapp.api.JiraService;
 import ru.filit.notificationapp.dto.ChatDto;
@@ -70,6 +72,8 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     }
 
     @Override
+    @Transactional
+    @Modifying
     public IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code) { //todo Сделать так чтобы при отписке удалялись объекты без связей
         Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
         IssueInfo issueInfo = chat.getSubscribeIssues()
@@ -78,6 +82,7 @@ public class IssueInfoServiceImpl implements IssueInfoService {
                 .findFirst()
                 .orElseThrow(() -> new CustomException("Such Issue is not found in this chat"));
         chat.getSubscribeIssues().remove(issueInfo);
+        log.info("Delete issue");
         chatRepository.save(chat);
         return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
     }

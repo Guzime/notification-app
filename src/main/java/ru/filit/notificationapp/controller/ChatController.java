@@ -39,7 +39,7 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getChatByTelegramId(telegramId));
     }
 
-    @PutMapping()
+    @PatchMapping()
     @Operation(summary = "Save chat")
     public ResponseEntity<ChatDto> saveChat(@RequestBody ChatDto chatDto) {
         log.info("Save chat");

@@ -28,7 +28,7 @@ public class IssueInfo {
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinTable(name = "issue_chat",
             schema = "jira",
             joinColumns = @JoinColumn(name = "issue_id"),
@@ -36,7 +36,7 @@ public class IssueInfo {
     @JsonIgnore
     private Set<Chat> subscribeChats = new LinkedHashSet<>();
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JoinColumn(name = "issue_id")
     private List<CommentInfo> comments = new LinkedList<>();
 
