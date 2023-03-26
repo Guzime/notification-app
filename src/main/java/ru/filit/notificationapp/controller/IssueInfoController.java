@@ -11,6 +11,8 @@ import ru.filit.notificationapp.dto.ChatDto;
 import ru.filit.notificationapp.dto.IssueInfoDto;
 import ru.filit.notificationapp.service.NotificationSchedulerImpl;
 
+import java.util.Set;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +22,13 @@ public class IssueInfoController {
 
     final private IssueInfoService issueInfoService;
     final private NotificationSchedulerImpl notificationScheduler;
+
+    @GetMapping("/telegram/{telegramId}")
+    @Operation(summary = "Get issue by Id")
+    public ResponseEntity<Set<IssueInfoDto>> getIssuesInfoByTelegramId(@PathVariable("telegramId") Long telegramId) {
+        log.info("Get issues from Chat by telegramId = {}", telegramId);
+        return ResponseEntity.ok(issueInfoService.getIssuesInfoByTelegramId(telegramId));
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get issue by Id")

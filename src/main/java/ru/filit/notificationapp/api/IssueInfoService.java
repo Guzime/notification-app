@@ -3,10 +3,14 @@ package ru.filit.notificationapp.api;
 import ru.filit.notificationapp.dto.ChatDto;
 import ru.filit.notificationapp.dto.IssueInfoDto;
 
+import java.util.Set;
+
 public interface IssueInfoService {
     IssueInfoDto getIssueInfoById(Long issueId);
 
     IssueInfoDto getIssueInfoByCode(String code);
+
+    Set<IssueInfoDto> getIssuesInfoByTelegramId(Long telegramId);
 
     IssueInfoDto saveIssueInfo(IssueInfoDto issueInfoDto);
 

@@ -19,6 +19,9 @@ import ru.filit.notificationapp.repository.ChatRepository;
 import ru.filit.notificationapp.repository.IssueRepository;
 import ru.filit.notificationapp.support.JiraParser;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -41,6 +44,13 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     public IssueInfoDto getIssueInfoByCode(String code) {
         IssueInfo issueInfo = issueRepository.findByCode(code).orElseThrow(() -> new CustomException("Issue is not found by code!"));
         return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
+    }
+
+    @Override
+    public Set<IssueInfoDto> getIssuesInfoByTelegramId(Long telegramId) {
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Chat is not found by telegramId!"));
+        Set<IssueInfo> issues = chat.getSubscribeIssues();
+        return issues.stream().map(issueInfoDtoMapper::toIssueInfoDto).collect(Collectors.toSet());
     }
 
     @Override
