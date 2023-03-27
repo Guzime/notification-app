@@ -12,6 +12,8 @@ import ru.filit.notificationapp.dto.ChatDto;
 import ru.filit.notificationapp.entity.jira.JiraIssueInfoResponse;
 import ru.filit.notificationapp.support.JiraParser;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +29,6 @@ public class ChatController {
     @Operation(summary = "Get chat by id")
     public ResponseEntity<ChatDto> getChatById(@PathVariable("id") Long chatId) {
         log.info("Get chat by id = {}", chatId);
-        JiraIssueInfoResponse issue = jiraService.findTicketInfo("IN-216");
-        log.info("{}", jiraParser.makeIssueInfoFromJiraIssueInfoResponse(issue));
         return ResponseEntity.ok(chatService.getChatById(chatId));
     }
 
