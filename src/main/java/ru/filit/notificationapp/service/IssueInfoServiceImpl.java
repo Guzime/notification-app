@@ -18,6 +18,7 @@ import ru.filit.notificationapp.mapper.IssueInfoDtoMapper;
 import ru.filit.notificationapp.repository.ChatRepository;
 import ru.filit.notificationapp.repository.IssueRepository;
 import ru.filit.notificationapp.support.JiraParser;
+import ru.filit.notificationapp.type.StatusCode;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,19 +37,19 @@ public class IssueInfoServiceImpl implements IssueInfoService {
 
     @Override
     public IssueInfoDto getIssueInfoById(Long issueId) {
-        IssueInfo issueInfo = issueRepository.findById(issueId).orElseThrow(() -> new CustomException("Issue is not found by id!"));
+        IssueInfo issueInfo = issueRepository.findById(issueId).orElseThrow(() -> new CustomException("Issue is not found by id!", StatusCode.JBOT_003));
         return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
     }
 
     @Override
     public IssueInfoDto getIssueInfoByCode(String code) {
-        IssueInfo issueInfo = issueRepository.findByCode(code).orElseThrow(() -> new CustomException("Issue is not found by code!"));
+        IssueInfo issueInfo = issueRepository.findByCode(code).orElseThrow(() -> new CustomException("Issue is not found by code!", StatusCode.JBOT_003));
         return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
     }
 
     @Override
     public Set<IssueInfoDto> getIssuesInfoByTelegramId(Long telegramId) {
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Chat is not found by telegramId!"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Chat is not found by telegramId!", StatusCode.JBOT_002));
         Set<IssueInfo> issues = chat.getSubscribeIssues();
         return issues.stream().map(issueInfoDtoMapper::toIssueInfoDto).collect(Collectors.toSet());
     }
@@ -61,7 +62,7 @@ public class IssueInfoServiceImpl implements IssueInfoService {
 
     @Override
     public ChatDto saveIssueInfoToChat(Long telegramId, IssueInfoDto issueInfoDto) {
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id", StatusCode.JBOT_002));
         log.info("Add IssueInfo to chat");
         chat.getSubscribeIssues().add(issueInfoDtoMapper.toIssueInfo(issueInfoDto));
         return chatDtoMapper.toChatDto(chatRepository.save(chat));
@@ -69,7 +70,7 @@ public class IssueInfoServiceImpl implements IssueInfoService {
 
     @Override
     public IssueInfoDto subscribeIssueInfoToChat(Long telegramId, String code) {
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id", StatusCode.JBOT_002));
         log.info("Get ticket by code");
         JiraIssueInfoResponse jiraIssueInfoResponse = jiraService.findTicketInfo(code);
         IssueInfo issueInfo = issueRepository.findByCode(code).orElse(jiraParser.makeIssueInfoFromJiraIssueInfoResponse(jiraIssueInfoResponse));
@@ -85,12 +86,12 @@ public class IssueInfoServiceImpl implements IssueInfoService {
     @Transactional
     @Modifying
     public IssueInfoDto unsubscribeIssueInfoFromChat(Long telegramId, String code) { //todo Сделать так чтобы при отписке удалялись объекты без связей
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id", StatusCode.JBOT_002));
         IssueInfo issueInfo = chat.getSubscribeIssues()
                 .stream()
                 .filter(issue -> code.equals(issue.getCode()))
                 .findFirst()
-                .orElseThrow(() -> new CustomException("Such Issue is not found in this chat"));
+                .orElseThrow(() -> new CustomException("Such Issue is not found in this chat", StatusCode.JBOT_003));
         chat.getSubscribeIssues().remove(issueInfo);
         log.info("Delete issue");
         chatRepository.save(chat);
@@ -99,8 +100,8 @@ public class IssueInfoServiceImpl implements IssueInfoService {
 
     @Override
     public ChatDto removeIssueForChat(Long telegramId, String code) {
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id"));
-        IssueInfo issueInfo = issueRepository.findByCode(code).orElseThrow(() -> new CustomException("Such Issue is not found by code"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram id", StatusCode.JBOT_002));
+        IssueInfo issueInfo = issueRepository.findByCode(code).orElseThrow(() -> new CustomException("Such Issue is not found by code", StatusCode.JBOT_003));
         log.info("Remove IssueInfo from chat");
         chat.getSubscribeIssues().remove(issueInfo);
         return chatDtoMapper.toChatDto(chatRepository.save(chat));
@@ -108,7 +109,7 @@ public class IssueInfoServiceImpl implements IssueInfoService {
 
     @Override
     public IssueInfoDto deleteIssueInfoById(Long issueId) {
-        IssueInfo issueInfo = issueRepository.findById(issueId).orElseThrow(() -> new CustomException("Such issue is not found by id!"));
+        IssueInfo issueInfo = issueRepository.findById(issueId).orElseThrow(() -> new CustomException("Such issue is not found by id!", StatusCode.JBOT_003));
         issueRepository.deleteById(issueId);
         return issueInfoDtoMapper.toIssueInfoDto(issueInfo);
     }

@@ -1,7 +1,6 @@
 package ru.filit.notificationapp.support;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class JiraParser {
-    private final ObjectMapper objectMapper;
-
     public IssueInfo makeIssueInfoFromJiraIssueInfoResponse(JiraIssueInfoResponse jiraIssueInfoResponse) {
         String title = jiraIssueInfoResponse.getFields().getSummary();
         String code = jiraIssueInfoResponse.getKey();

@@ -7,12 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.filit.notificationapp.api.ChatService;
-import ru.filit.notificationapp.api.JiraService;
 import ru.filit.notificationapp.dto.ChatDto;
-import ru.filit.notificationapp.entity.jira.JiraIssueInfoResponse;
-import ru.filit.notificationapp.support.JiraParser;
-
-import java.time.LocalDateTime;
+import ru.filit.notificationapp.dto.ResponseDto;
+import ru.filit.notificationapp.exception.CustomException;
+import ru.filit.notificationapp.mapper.ResponseDtoMapper;
+import ru.filit.notificationapp.type.StatusCode;
 
 @Slf4j
 @RestController
@@ -22,28 +21,54 @@ import java.time.LocalDateTime;
 public class ChatController {
 
     final private ChatService chatService;
-    final private JiraService jiraService;
-    final private JiraParser jiraParser;
+    final private ResponseDtoMapper responseDtoMapper;
 
     @GetMapping("/{id}")
     @Operation(summary = "Get chat by id")
-    public ResponseEntity<ChatDto> getChatById(@PathVariable("id") Long chatId) {
+    public ResponseEntity<ResponseDto> getChatById(@PathVariable("id") Long chatId) {
         log.info("Get chat by id = {}", chatId);
-        return ResponseEntity.ok(chatService.getChatById(chatId));
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(chatService.getChatById(chatId), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for chatId= {}, getChatById ={}", chatId, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/telegram/{telegramId}")
     @Operation(summary = "Get chat by telegram id")
-    public ResponseEntity<ChatDto> getChatByTelegramId(@PathVariable("telegramId") Long telegramId) {
+    public ResponseEntity<ResponseDto> getChatByTelegramId(@PathVariable("telegramId") Long telegramId) {
         log.info("Get chat by telegram id = {}", telegramId);
-        return ResponseEntity.ok(chatService.getChatByTelegramId(telegramId));
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(chatService.getChatByTelegramId(telegramId), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for telegramId= {}, getChatByTelegramId ={}", telegramId, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PatchMapping()
     @Operation(summary = "Save chat")
-    public ResponseEntity<ChatDto> saveChat(@RequestBody ChatDto chatDto) {
-        log.info("Save chat");
-        return ResponseEntity.ok(chatService.saveChat(chatDto));
+    public ResponseEntity<ResponseDto> saveChat(@RequestBody ChatDto chatDto) {
+        log.info("Save chat. ChatDto = {}", chatDto);
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(chatService.saveChat(chatDto), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for chatDto= {}, saveChat ={}", chatDto, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/{id}")
@@ -55,8 +80,17 @@ public class ChatController {
 
     @DeleteMapping("/telegram/{telegramId}")
     @Operation(summary = "Delete telegram by Id")
-    public ResponseEntity<ChatDto> deleteChatByTelegramId(@PathVariable("telegramId") Long telegramId) {
+    public ResponseEntity<ResponseDto> deleteChatByTelegramId(@PathVariable("telegramId") Long telegramId) {
         log.info("Delete telegram Id by id = {}", telegramId);
-        return ResponseEntity.ok(chatService.deleteChatByTelegramId(telegramId));
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(chatService.deleteChatByTelegramId(telegramId), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for telegramId= {}, deleteChatByTelegramId ={}", telegramId, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

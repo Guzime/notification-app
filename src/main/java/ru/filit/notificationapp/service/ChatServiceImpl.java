@@ -2,7 +2,6 @@ package ru.filit.notificationapp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.filit.notificationapp.api.ChatService;
@@ -11,6 +10,7 @@ import ru.filit.notificationapp.entity.Chat;
 import ru.filit.notificationapp.exception.CustomException;
 import ru.filit.notificationapp.mapper.ChatDtoMapper;
 import ru.filit.notificationapp.repository.ChatRepository;
+import ru.filit.notificationapp.type.StatusCode;
 
 import java.time.LocalDateTime;
 
@@ -24,13 +24,13 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatDto getChatById(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new CustomException("Chat is not found by id!"));
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new CustomException("Chat is not found by id!", StatusCode.JBOT_002));
         return chatDtoMapper.toChatDto(chat);
     }
 
     @Override
     public ChatDto getChatByTelegramId(Long telegramId) {
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Chat is not found by telegramId!"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Chat is not found by telegramId!", StatusCode.JBOT_002));
         return chatDtoMapper.toChatDto(chat);
     }
 
@@ -54,7 +54,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public ChatDto deleteChatById(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new CustomException("Such chat is not found by id!"));
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new CustomException("Such chat is not found by id!", StatusCode.JBOT_002));
         chatRepository.deleteById(chatId);
         return chatDtoMapper.toChatDto(chat);
     }
@@ -62,7 +62,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public ChatDto deleteChatByTelegramId(Long telegramId) {
-        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram Id!"));
+        Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Such chat is not found by telegram Id!", StatusCode.JBOT_002));
         chatRepository.deleteByTelegramId(telegramId);
         return chatDtoMapper.toChatDto(chat);
     }

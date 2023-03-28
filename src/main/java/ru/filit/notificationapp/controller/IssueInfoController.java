@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.filit.notificationapp.api.IssueInfoService;
 import ru.filit.notificationapp.dto.ChatDto;
 import ru.filit.notificationapp.dto.IssueInfoDto;
+import ru.filit.notificationapp.dto.ResponseDto;
+import ru.filit.notificationapp.exception.CustomException;
+import ru.filit.notificationapp.mapper.ResponseDtoMapper;
 import ru.filit.notificationapp.service.NotificationSchedulerImpl;
-
-import java.util.Set;
+import ru.filit.notificationapp.type.StatusCode;
 
 @Slf4j
 @RestController
@@ -22,12 +24,22 @@ public class IssueInfoController {
 
     final private IssueInfoService issueInfoService;
     final private NotificationSchedulerImpl notificationScheduler;
+    final private ResponseDtoMapper responseDtoMapper;
 
     @GetMapping("/telegram/{telegramId}")
-    @Operation(summary = "Get issue by Id")
-    public ResponseEntity<Set<IssueInfoDto>> getIssuesInfoByTelegramId(@PathVariable("telegramId") Long telegramId) {
+    @Operation(summary = "Get issues by telegramId")
+    public ResponseEntity<ResponseDto> getIssuesInfoByTelegramId(@PathVariable("telegramId") Long telegramId) {
         log.info("Get issues from Chat by telegramId = {}", telegramId);
-        return ResponseEntity.ok(issueInfoService.getIssuesInfoByTelegramId(telegramId));
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(issueInfoService.getIssuesInfoByTelegramId(telegramId), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for telegramId = {}, getIssuesInfoByTelegramId = {}", telegramId, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +50,7 @@ public class IssueInfoController {
     }
 
     @GetMapping("/code/{code}")
-    @Operation(summary = "Get issue bu Code")
+    @Operation(summary = "Get issue by Code")
     public ResponseEntity<IssueInfoDto> getIssueInfoByCode(@PathVariable("code") String code) {
         log.info("Get issue by code = {}", code);
         notificationScheduler.scheduleFixedDelayTask();
@@ -61,16 +73,34 @@ public class IssueInfoController {
 
     @PatchMapping("/subscribe/{telegramId}/{code}")
     @Operation(summary = "Subscribe Issue to chat")
-    public ResponseEntity<IssueInfoDto> subscribeIssueToChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
+    public ResponseEntity<ResponseDto> subscribeIssueToChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
         log.info("Subscribe Issue to chat");
-        return ResponseEntity.ok(issueInfoService.subscribeIssueInfoToChat(telegramId, code));
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(issueInfoService.subscribeIssueInfoToChat(telegramId, code), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for telegramId = {}, code = {}, subscribeIssueToChat = {}", telegramId, code, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/unsubscribe/{telegramId}/{code}")
     @Operation(summary = "Unsubscribe Issue from chat")
-    public ResponseEntity<IssueInfoDto> unsubscribeIssueFromChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
+    public ResponseEntity<ResponseDto> unsubscribeIssueFromChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
         log.info("Unsubscribe Issue from chat");
-        return ResponseEntity.ok(issueInfoService.unsubscribeIssueInfoFromChat(telegramId, code));
+        ResponseDto responseDto;
+        try {
+            responseDto = responseDtoMapper.createResponseDto(issueInfoService.unsubscribeIssueInfoFromChat(telegramId, code), StatusCode.JBOT_001, StatusCode.JBOT_001.getMessage());
+        } catch (CustomException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, e.status, e.status.getMessage());
+        } catch (RuntimeException e) {
+            responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
+        }
+        log.error("Response for telegramId = {}, code = {}, unsubscribeIssueFromChat = {}", telegramId, code, responseDto);
+        return ResponseEntity.ok(responseDto);
     }
 
     @DeleteMapping("/telegram/{telegramId}/{code}")

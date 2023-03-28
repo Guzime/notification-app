@@ -2,7 +2,6 @@ package ru.filit.notificationapp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.filit.notificationapp.api.CommentInfoService;
 import ru.filit.notificationapp.api.JiraService;
@@ -29,7 +28,7 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
     private final CommentInfoDtoMapper commentInfoDtoMapper;
     private final CommentInfoService commentInfoService;
 
-    @Scheduled(fixedDelay = 60000)
+    //    @Scheduled(fixedDelay = 60000)
     public void scheduleFixedDelayTask() {
         List<IssueInfo> issuesFromDb = (List<IssueInfo>) issueRepository.findAll();
         for (IssueInfo issue : issuesFromDb) {
