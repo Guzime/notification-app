@@ -7,6 +7,7 @@ public interface CommentInfoService {
     CommentInfoDto getCommentInfoById(Long commentId);
 
     CommentInfoDto saveCommentInfo(CommentInfoDto commentInfoDto);
+
     IssueInfoDto saveCommentInfoForIssue(String issueCode, CommentInfoDto commentInfoDto);
 
     CommentInfoDto deleteCommentInfoById(Long commentId);

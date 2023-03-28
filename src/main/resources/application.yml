@@ -4,6 +4,8 @@ springdoc:
 feign:
   jira:
     url: "http://localhost:8081/tickets/jira"
+  telegram-bot:
+    url: "http://localhost:8082/tickets/jira"
 spring:
   datasource:
     driver-class-name: "org.postgresql.Driver"

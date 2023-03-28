@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.filit.notificationapp.api.CommentInfoService;
 import ru.filit.notificationapp.api.JiraService;
 import ru.filit.notificationapp.api.NotificationScheduler;
+import ru.filit.notificationapp.api.TelegramBotService;
 import ru.filit.notificationapp.dto.CommentInfoDto;
+import ru.filit.notificationapp.dto.CommentsRequestDto;
 import ru.filit.notificationapp.dto.IssueInfoDto;
-import ru.filit.notificationapp.entity.CommentInfo;
+import ru.filit.notificationapp.dto.IssueRequestDto;
+import ru.filit.notificationapp.entity.Chat;
 import ru.filit.notificationapp.entity.IssueInfo;
 import ru.filit.notificationapp.entity.jira.JiraIssueInfoResponse;
 import ru.filit.notificationapp.mapper.CommentInfoDtoMapper;
@@ -17,6 +20,8 @@ import ru.filit.notificationapp.repository.IssueRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,19 +32,21 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
     private final IssueInfoDtoMapper issueInfoDtoMapper;
     private final CommentInfoDtoMapper commentInfoDtoMapper;
     private final CommentInfoService commentInfoService;
+    private final TelegramBotService telegramBotService;
 
     //    @Scheduled(fixedDelay = 60000)
     public void scheduleFixedDelayTask() {
         List<IssueInfo> issuesFromDb = (List<IssueInfo>) issueRepository.findAll();
         for (IssueInfo issue : issuesFromDb) {
             JiraIssueInfoResponse jiraIssueInfoResponse = jiraService.findTicketInfo(issue.getCode());
-            compareAndSaveChangedIssue(jiraIssueInfoResponse, issue);
-            compareAndSaveNewComments(jiraIssueInfoResponse, issue.getComments());
+            Set<Long> telegramsId = issue.getSubscribeChats().stream().map(Chat::getTelegramId).collect(Collectors.toSet());
+            compareAndSaveChangedIssue(jiraIssueInfoResponse, issue, telegramsId);
+            compareAndSaveNewComments(jiraIssueInfoResponse, issue, telegramsId);
         }
         log.info("Fixed delay task - {}", System.currentTimeMillis() / 1000);
     }
 
-    public void compareAndSaveChangedIssue(JiraIssueInfoResponse jiraIssueInfoResponse, IssueInfo issueInfo) {
+    public void compareAndSaveChangedIssue(JiraIssueInfoResponse jiraIssueInfoResponse, IssueInfo issueInfo, Set<Long> telegramsId) {
         IssueInfoDto issueInfoDto = issueInfoDtoMapper.toIssueInfoDto(issueInfo);
         IssueInfoDto issueInfoDtoFromJira = issueInfoDtoMapper.toIssueInfoDto(jiraIssueInfoResponse);
         if (!issueInfoDto.equals(issueInfoDtoFromJira)) {
@@ -52,12 +59,22 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
                     .build();
             issueRepository.save(issueInfoForSave);
             //todo встроить переброс информации в чат
+            IssueRequestDto issueRequestDto = IssueRequestDto.builder()
+                    .telegramsId(telegramsId)
+                    .code(issueInfoForSave.getCode())
+                    .title(issueInfoForSave.getTitle())
+                    .status(issueInfoForSave.getStatus())
+                    .statusPrevious(issueInfo.getStatus())
+                    .changedDescription(issueInfo.getDescription().equals(issueInfoForSave.getDescription()))
+                    .changedTitle(issueInfo.getTitle().equals(issueInfoForSave.getTitle()))
+                    .build();
+            telegramBotService.sendIssueForTelegram(issueRequestDto);
         }
     }
 
-    public void compareAndSaveNewComments(JiraIssueInfoResponse jiraIssueInfoResponse, List<CommentInfo> comments) {
+    public void compareAndSaveNewComments(JiraIssueInfoResponse jiraIssueInfoResponse, IssueInfo issue, Set<Long> telegramsId) {
         List<CommentInfoDto> commentsFromJira = commentInfoDtoMapper.toCommentsInfoDto(jiraIssueInfoResponse);
-        List<CommentInfoDto> commentsFromDb = commentInfoDtoMapper.toCommentsInfoDto(comments);
+        List<CommentInfoDto> commentsFromDb = commentInfoDtoMapper.toCommentsInfoDto(issue.getComments());
         List<CommentInfoDto> differentComments = commentsFromJira.stream()
                 .filter(commentInfoDto -> commentsFromDb.stream()
                         .filter(commentFromDb -> commentInfoDto.jiraId().equals(commentFromDb.jiraId()))
@@ -66,6 +83,13 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
             log.info("Add new comments");
             differentComments.forEach(comment -> commentInfoService.saveCommentInfoForIssue(jiraIssueInfoResponse.getKey(), comment));
             //todo встроить переброс информации в чат
+            Set<String> descriptions = differentComments.stream().map(CommentInfoDto::description).collect(Collectors.toSet());
+            CommentsRequestDto commentsRequestDto = CommentsRequestDto.builder()
+                    .telegramsId(telegramsId)
+                    .code(issue.getCode())
+                    .comments(descriptions)
+                    .build();
+            telegramBotService.sendCommentsForTelegram(commentsRequestDto);
         }
     }
 }
