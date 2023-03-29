@@ -12,5 +12,5 @@ import java.util.Set;
 public class CommentsRequestDto {
     private Set<Long> telegramsId;
     private String code;
-    Set<String> comments;
+    Set<CommentRequestDto> comments;
 }

@@ -1,16 +1,15 @@
 package ru.filit.notificationapp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.filit.notificationapp.api.CommentInfoService;
 import ru.filit.notificationapp.api.JiraService;
 import ru.filit.notificationapp.api.NotificationScheduler;
 import ru.filit.notificationapp.api.TelegramBotService;
-import ru.filit.notificationapp.dto.CommentInfoDto;
-import ru.filit.notificationapp.dto.CommentsRequestDto;
-import ru.filit.notificationapp.dto.IssueInfoDto;
-import ru.filit.notificationapp.dto.IssueRequestDto;
+import ru.filit.notificationapp.dto.*;
 import ru.filit.notificationapp.entity.Chat;
 import ru.filit.notificationapp.entity.IssueInfo;
 import ru.filit.notificationapp.entity.jira.JiraIssueInfoResponse;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@ToString
 public class NotificationSchedulerImpl implements NotificationScheduler {
     private final IssueRepository issueRepository;
     private final JiraService jiraService;
@@ -34,7 +34,7 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
     private final CommentInfoService commentInfoService;
     private final TelegramBotService telegramBotService;
 
-    //    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 60000)
     public void scheduleFixedDelayTask() {
         List<IssueInfo> issuesFromDb = (List<IssueInfo>) issueRepository.findAll();
         for (IssueInfo issue : issuesFromDb) {
@@ -58,17 +58,17 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
                     .updatedDate(LocalDateTime.now())
                     .build();
             issueRepository.save(issueInfoForSave);
-            //todo встроить переброс информации в чат
             IssueRequestDto issueRequestDto = IssueRequestDto.builder()
                     .telegramsId(telegramsId)
                     .code(issueInfoForSave.getCode())
                     .title(issueInfoForSave.getTitle())
                     .status(issueInfoForSave.getStatus())
                     .statusPrevious(issueInfo.getStatus())
-                    .changedDescription(issueInfo.getDescription().equals(issueInfoForSave.getDescription()))
-                    .changedTitle(issueInfo.getTitle().equals(issueInfoForSave.getTitle()))
+                    .changedDescription(!issueInfo.getDescription().equals(issueInfoForSave.getDescription()))
+                    .changedTitle(!issueInfo.getTitle().equals(issueInfoForSave.getTitle()))
                     .build();
-            telegramBotService.sendIssueForTelegram(issueRequestDto);
+            telegramBotService.sendIssueNotification(issueRequestDto);
+            log.info("Request issueRequestDto={}", issueRequestDto);
         }
     }
 
@@ -82,14 +82,17 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
         if (!differentComments.isEmpty()) {
             log.info("Add new comments");
             differentComments.forEach(comment -> commentInfoService.saveCommentInfoForIssue(jiraIssueInfoResponse.getKey(), comment));
-            //todo встроить переброс информации в чат
-            Set<String> descriptions = differentComments.stream().map(CommentInfoDto::description).collect(Collectors.toSet());
+            Set<CommentRequestDto> differentCommentRequestDto = differentComments.stream()
+                    .map(commentInfoDto -> CommentRequestDto.builder().description(commentInfoDto.description())
+                            .author(commentInfoDto.author()).build())
+                    .collect(Collectors.toSet());
             CommentsRequestDto commentsRequestDto = CommentsRequestDto.builder()
                     .telegramsId(telegramsId)
                     .code(issue.getCode())
-                    .comments(descriptions)
+                    .comments(differentCommentRequestDto)
                     .build();
-            telegramBotService.sendCommentsForTelegram(commentsRequestDto);
+            log.info("Request issueRequestDto={}", commentsRequestDto);
+            telegramBotService.sendCommentNotification(commentsRequestDto);
         }
     }
 }

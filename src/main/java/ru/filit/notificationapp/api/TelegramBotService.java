@@ -9,8 +9,8 @@ import ru.filit.notificationapp.dto.IssueRequestDto;
 @FeignClient(name = "TelegramBot", url = "${feign.telegram-bot.url}")
 public interface TelegramBotService {
     @PostMapping("/issue")
-    void sendIssueForTelegram(@RequestBody IssueRequestDto issueRequestDto);
+    void sendIssueNotification(@RequestBody IssueRequestDto issueRequestDto);
 
     @PostMapping("/comment")
-    void sendCommentsForTelegram(@RequestBody CommentsRequestDto commentsRequestDto);
+    void sendCommentNotification(@RequestBody CommentsRequestDto commentsRequestDto);
 }

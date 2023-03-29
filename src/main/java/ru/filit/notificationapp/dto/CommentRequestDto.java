@@ -8,6 +8,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class CommentRequestDto {
-    private Long author;
+    private String author;
     private String description;
 }

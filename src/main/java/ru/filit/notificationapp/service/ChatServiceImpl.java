@@ -13,6 +13,7 @@ import ru.filit.notificationapp.repository.ChatRepository;
 import ru.filit.notificationapp.type.StatusCode;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,9 +43,9 @@ public class ChatServiceImpl implements ChatService {
             chat = chatRepository.save(chatDtoMapper.toChat(chatDto));
         } else {
             chat = chatRepository.save(chatFromDb.toBuilder()
-                    .title(chatDto.title())
-                    .status(chatDto.status())
-                    .type(chatDto.type())
+                    .title(Objects.isNull(chatDto.title()) ? chatFromDb.getTitle() : chatDto.title())
+                    .status(Objects.isNull(chatDto.status()) ? chatFromDb.getStatus() : chatDto.status())
+                    .type(Objects.isNull(chatDto.type()) ? chatFromDb.getType() : chatDto.type())
                     .updatedDate(LocalDateTime.now())
                     .build());
         }

@@ -71,7 +71,7 @@ public class IssueInfoController {
         return ResponseEntity.ok(issueInfoService.saveIssueInfoToChat(telegramId, issueInfoDto));
     }
 
-    @PatchMapping("/subscribe/{telegramId}/{code}")
+    @PostMapping("/subscribe/{telegramId}/{code}")
     @Operation(summary = "Subscribe Issue to chat")
     public ResponseEntity<ResponseDto> subscribeIssueToChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
         log.info("Subscribe Issue to chat");
