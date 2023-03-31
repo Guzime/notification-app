@@ -19,6 +19,7 @@ import ru.filit.notificationapp.repository.IssueRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,10 +35,14 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
     private final CommentInfoService commentInfoService;
     private final TelegramBotService telegramBotService;
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 600000)
     public void scheduleFixedDelayTask() {
         List<IssueInfo> issuesFromDb = (List<IssueInfo>) issueRepository.findAll();
         for (IssueInfo issue : issuesFromDb) {
+            if (issue.getSubscribeChats().isEmpty() || Objects.isNull(issue.getSubscribeChats())) {
+                issueRepository.delete(issue);
+                continue;
+            }
             JiraIssueInfoResponse jiraIssueInfoResponse = jiraService.findTicketInfo(issue.getCode());
             Set<Long> telegramsId = issue.getSubscribeChats().stream().map(Chat::getTelegramId).collect(Collectors.toSet());
             compareAndSaveChangedIssue(jiraIssueInfoResponse, issue, telegramsId);

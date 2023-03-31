@@ -24,19 +24,13 @@ public class ChatServiceImpl implements ChatService {
     private final ChatDtoMapper chatDtoMapper;
 
     @Override
-    public ChatDto getChatById(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new CustomException("Chat is not found by id!", StatusCode.JBOT_002));
-        return chatDtoMapper.toChatDto(chat);
-    }
-
-    @Override
     public ChatDto getChatByTelegramId(Long telegramId) {
         Chat chat = chatRepository.findByTelegramId(telegramId).orElseThrow(() -> new CustomException("Chat is not found by telegramId!", StatusCode.JBOT_002));
         return chatDtoMapper.toChatDto(chat);
     }
 
     @Override
-    public ChatDto saveChat(ChatDto chatDto) {
+    public ChatDto upsertChat(ChatDto chatDto) {
         Chat chatFromDb = chatRepository.findByTelegramId(chatDto.telegramId()).orElse(null);
         Chat chat;
         if (chatFromDb == null) {
@@ -49,14 +43,6 @@ public class ChatServiceImpl implements ChatService {
                     .updatedDate(LocalDateTime.now())
                     .build());
         }
-        return chatDtoMapper.toChatDto(chat);
-    }
-
-    @Override
-    @Transactional
-    public ChatDto deleteChatById(Long chatId) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new CustomException("Such chat is not found by id!", StatusCode.JBOT_002));
-        chatRepository.deleteById(chatId);
         return chatDtoMapper.toChatDto(chat);
     }
 

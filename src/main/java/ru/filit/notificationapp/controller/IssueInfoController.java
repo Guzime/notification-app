@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.filit.notificationapp.api.IssueInfoService;
-import ru.filit.notificationapp.dto.ChatDto;
-import ru.filit.notificationapp.dto.IssueInfoDto;
 import ru.filit.notificationapp.dto.ResponseDto;
 import ru.filit.notificationapp.exception.CustomException;
 import ru.filit.notificationapp.mapper.ResponseDtoMapper;
@@ -38,37 +36,8 @@ public class IssueInfoController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response for telegramId = {}, getIssuesInfoByTelegramId = {}", telegramId, responseDto);
+        log.error("Response getIssuesInfoByTelegramId. telegramId = {}, getIssuesInfoByTelegramId = {}", telegramId, responseDto);
         return ResponseEntity.ok(responseDto);
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Get issue by Id")
-    public ResponseEntity<IssueInfoDto> getIssueInfoById(@PathVariable("id") Long issueId) {
-        log.info("Get issue by id = {}", issueId);
-        return ResponseEntity.ok(issueInfoService.getIssueInfoById(issueId));
-    }
-
-    @GetMapping("/code/{code}")
-    @Operation(summary = "Get issue by Code")
-    public ResponseEntity<IssueInfoDto> getIssueInfoByCode(@PathVariable("code") String code) {
-        log.info("Get issue by code = {}", code);
-        notificationScheduler.scheduleFixedDelayTask();
-        return ResponseEntity.ok(issueInfoService.getIssueInfoByCode(code));
-    }
-
-    @PutMapping()
-    @Operation(summary = "Save issue")
-    public ResponseEntity<IssueInfoDto> saveChat(@RequestBody IssueInfoDto issueInfoDto) {
-        log.info("Save issue");
-        return ResponseEntity.ok(issueInfoService.saveIssueInfo(issueInfoDto));
-    }
-
-    @PutMapping("/telegram/{telegramId}")
-    @Operation(summary = "Save Issue for chat")
-    public ResponseEntity<ChatDto> saveIssueForChat(@PathVariable("telegramId") Long telegramId, @RequestBody IssueInfoDto issueInfoDto) {
-        log.info("Save Issue for telegram");
-        return ResponseEntity.ok(issueInfoService.saveIssueInfoToChat(telegramId, issueInfoDto));
     }
 
     @PostMapping("/subscribe/{telegramId}/{code}")
@@ -83,7 +52,7 @@ public class IssueInfoController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response for telegramId = {}, code = {}, subscribeIssueToChat = {}", telegramId, code, responseDto);
+        log.error("Response subscribeIssueToChat. telegramId = {}, code = {}, subscribeIssueToChat = {}", telegramId, code, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -99,21 +68,7 @@ public class IssueInfoController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response for telegramId = {}, code = {}, unsubscribeIssueFromChat = {}", telegramId, code, responseDto);
+        log.error("Response unsubscribeIssueFromChat. telegramId = {}, code = {}, unsubscribeIssueFromChat = {}", telegramId, code, responseDto);
         return ResponseEntity.ok(responseDto);
-    }
-
-    @DeleteMapping("/telegram/{telegramId}/{code}")
-    @Operation(summary = "Remove Issue for chat")
-    public ResponseEntity<ChatDto> removeIssueForChat(@PathVariable("telegramId") Long telegramId, @PathVariable("code") String code) {
-        log.info("Delete Issue for telegram");
-        return ResponseEntity.ok(issueInfoService.removeIssueForChat(telegramId, code));
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete issue by Id")
-    public ResponseEntity<IssueInfoDto> deleteChat(@PathVariable("id") Long issueId) {
-        log.info("Delete issue by id = {}", issueId);
-        return ResponseEntity.ok(issueInfoService.deleteIssueInfoById(issueId));
     }
 }
