@@ -1,7 +1,7 @@
 version: '3.2'
 
 services:
-  jira-bot-ms:
+  notification-app:
     container_name: notification-app
     build:
       context: .
