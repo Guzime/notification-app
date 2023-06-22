@@ -9,7 +9,7 @@ feign:
 spring:
   datasource:
     driver-class-name: "org.postgresql.Driver"
-    url: "jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/Jira"
+    url: "jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/jira"
     username: "${DB_LOGIN:root}"
     password: "${DB_PASSWORD:root}"
   flyway:
