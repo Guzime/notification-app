@@ -14,6 +14,8 @@ services:
       DB_PORT: 5432
       DB_LOGIN: postgres
       DB_PASSWORD: postgres
+      PROXY_SERVICE_URL: "proxy-service:8083/tickets/jira"
+      BOT_URL: "jira-bot-ms:8082"
     networks:
       - jira-bot-net
 networks:

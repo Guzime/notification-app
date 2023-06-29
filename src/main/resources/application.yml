@@ -3,9 +3,9 @@ springdoc:
     operationsSorter: "method"
 feign:
   jira:
-    url: "http://localhost:8081/tickets/jira"
+    url: "${PROXY_SERVICE_URL:http://localhost:8081/tickets/jira}"
   telegram-bot:
-    url: "http://localhost:8082"
+    url: "${BOT_URL:http://localhost:8082}"
 spring:
   datasource:
     driver-class-name: "org.postgresql.Driver"
