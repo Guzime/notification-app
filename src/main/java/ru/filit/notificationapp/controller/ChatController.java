@@ -35,7 +35,7 @@ public class ChatController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response getChatByTelegramId. telegramId= {}, getChatByTelegramId ={}", telegramId, responseDto);
+        log.info("Response getChatByTelegramId. telegramId= {}, getChatByTelegramId ={}", telegramId, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -51,7 +51,7 @@ public class ChatController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response upsertChat. chatDto= {}, saveChat ={}", chatDto, responseDto);
+        log.info("Response upsertChat. chatDto= {}, saveChat ={}", chatDto, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -67,7 +67,7 @@ public class ChatController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response deleteChatByTelegramId. telegramId= {}, deleteChatByTelegramId ={}", telegramId, responseDto);
+        log.info("Response deleteChatByTelegramId. telegramId= {}, deleteChatByTelegramId ={}", telegramId, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 }

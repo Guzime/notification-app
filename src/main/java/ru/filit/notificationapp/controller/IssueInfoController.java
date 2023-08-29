@@ -36,7 +36,7 @@ public class IssueInfoController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response getIssuesInfoByTelegramId. telegramId = {}, getIssuesInfoByTelegramId = {}", telegramId, responseDto);
+        log.info("Response getIssuesInfoByTelegramId. telegramId = {}, getIssuesInfoByTelegramId = {}", telegramId, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -52,7 +52,7 @@ public class IssueInfoController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response subscribeIssueToChat. telegramId = {}, code = {}, subscribeIssueToChat = {}", telegramId, code, responseDto);
+        log.info("Response subscribeIssueToChat. telegramId = {}, code = {}, subscribeIssueToChat = {}", telegramId, code, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -68,7 +68,7 @@ public class IssueInfoController {
         } catch (RuntimeException e) {
             responseDto = responseDtoMapper.createResponseDto(null, StatusCode.JBOT_006, e.getMessage());
         }
-        log.error("Response unsubscribeIssueFromChat. telegramId = {}, code = {}, unsubscribeIssueFromChat = {}", telegramId, code, responseDto);
+        log.info("Response unsubscribeIssueFromChat. telegramId = {}, code = {}, unsubscribeIssueFromChat = {}", telegramId, code, responseDto);
         return ResponseEntity.ok(responseDto);
     }
 }
