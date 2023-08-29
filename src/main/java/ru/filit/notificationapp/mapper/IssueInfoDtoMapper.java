@@ -21,10 +21,10 @@ public class IssueInfoDtoMapper {
 
     public IssueInfo toIssueInfo(IssueInfoDto issueInfoDto) {
         return IssueInfo.builder()
-                .title(issueInfoDto.title())
-                .code(issueInfoDto.code())
-                .status(issueInfoDto.status())
-                .description(issueInfoDto.description())
+                .title(issueInfoDto.getTitle())
+                .code(issueInfoDto.getCode())
+                .status(issueInfoDto.getStatus())
+                .description(issueInfoDto.getDescription())
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();

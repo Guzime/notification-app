@@ -20,10 +20,10 @@ public class ChatDtoMapper {
 
     public Chat toChat(ChatDto chatDto) {
         return Chat.builder()
-                .title(chatDto.title())
-                .type(chatDto.type())
-                .status(chatDto.status())
-                .telegramId(chatDto.telegramId())
+                .title(chatDto.getTitle())
+                .type(chatDto.getType())
+                .status(chatDto.getStatus())
+                .telegramId(chatDto.getTelegramId())
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();

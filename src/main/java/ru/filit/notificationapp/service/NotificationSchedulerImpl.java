@@ -57,9 +57,9 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
         if (!issueInfoDto.equals(issueInfoDtoFromJira)) {
             log.info("Issues are different. Issue = " + issueInfo.getCode());
             IssueInfo issueInfoForSave = issueInfo.toBuilder()
-                    .description(issueInfoDtoFromJira.description())
-                    .status(issueInfoDtoFromJira.status())
-                    .title(issueInfoDtoFromJira.title())
+                    .description(issueInfoDtoFromJira.getDescription())
+                    .status(issueInfoDtoFromJira.getStatus())
+                    .title(issueInfoDtoFromJira.getTitle())
                     .updatedDate(LocalDateTime.now())
                     .build();
             issueRepository.save(issueInfoForSave);
@@ -82,14 +82,14 @@ public class NotificationSchedulerImpl implements NotificationScheduler {
         List<CommentInfoDto> commentsFromDb = commentInfoDtoMapper.toCommentsInfoDto(issue.getComments());
         List<CommentInfoDto> differentComments = commentsFromJira.stream()
                 .filter(commentInfoDto -> commentsFromDb.stream()
-                        .filter(commentFromDb -> commentInfoDto.jiraId().equals(commentFromDb.jiraId()))
+                        .filter(commentFromDb -> commentInfoDto.getJiraId().equals(commentFromDb.getJiraId()))
                         .findAny().isEmpty()).toList();
         if (!differentComments.isEmpty()) {
             log.info("Add new comments");
             differentComments.forEach(comment -> commentInfoService.saveCommentInfoForIssue(jiraIssueInfoResponse.getKey(), comment));
             Set<CommentRequestDto> differentCommentRequestDto = differentComments.stream()
-                    .map(commentInfoDto -> CommentRequestDto.builder().description(commentInfoDto.description())
-                            .author(commentInfoDto.author()).build())
+                    .map(commentInfoDto -> CommentRequestDto.builder().description(commentInfoDto.getDescription())
+                            .author(commentInfoDto.getAuthor()).build())
                     .collect(Collectors.toSet());
             CommentsRequestDto commentsRequestDto = CommentsRequestDto.builder()
                     .telegramsId(telegramsId)

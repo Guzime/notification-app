@@ -48,10 +48,10 @@ public class CommentInfoDtoMapper {
 
     public CommentInfo toCommentInfo(CommentInfoDto commentInfoDto) {
         return CommentInfo.builder()
-                .author(commentInfoDto.author())
-                .issueId(commentInfoDto.issueId())
-                .jiraId(commentInfoDto.jiraId())
-                .description(commentInfoDto.description())
+                .author(commentInfoDto.getAuthor())
+                .issueId(commentInfoDto.getIssueId())
+                .jiraId(commentInfoDto.getJiraId())
+                .description(commentInfoDto.getDescription())
                 .createdDate(LocalDateTime.now())
                 .updatedDate(LocalDateTime.now())
                 .build();

@@ -31,15 +31,15 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatDto upsertChat(ChatDto chatDto) {
-        Chat chatFromDb = chatRepository.findByTelegramId(chatDto.telegramId()).orElse(null);
+        Chat chatFromDb = chatRepository.findByTelegramId(chatDto.getTelegramId()).orElse(null);
         Chat chat;
         if (chatFromDb == null) {
             chat = chatRepository.save(chatDtoMapper.toChat(chatDto));
         } else {
             chat = chatRepository.save(chatFromDb.toBuilder()
-                    .title(Objects.isNull(chatDto.title()) ? chatFromDb.getTitle() : chatDto.title())
-                    .status(Objects.isNull(chatDto.status()) ? chatFromDb.getStatus() : chatDto.status())
-                    .type(Objects.isNull(chatDto.type()) ? chatFromDb.getType() : chatDto.type())
+                    .title(Objects.isNull(chatDto.getTitle()) ? chatFromDb.getTitle() : chatDto.getTitle())
+                    .status(Objects.isNull(chatDto.getStatus()) ? chatFromDb.getStatus() : chatDto.getStatus())
+                    .type(Objects.isNull(chatDto.getType()) ? chatFromDb.getType() : chatDto.getType())
                     .updatedDate(LocalDateTime.now())
                     .build());
         }

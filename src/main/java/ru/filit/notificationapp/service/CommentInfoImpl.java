@@ -24,7 +24,7 @@ public class CommentInfoImpl implements CommentInfoService {
     @Override
     public IssueInfoDto saveCommentInfoForIssue(String issueCode, CommentInfoDto commentInfoDto) {
         IssueInfo issueInfo = issueRepository.findByCode(issueCode).orElseThrow(() -> new CustomException("Such issue is not found by code", StatusCode.JBOT_003));
-        log.info("Add comment to issue. Comment jiraId = {}, Issue Code = {}", commentInfoDto.jiraId(), issueCode);
+        log.info("Add comment to issue. Comment jiraId = {}, Issue Code = {}", commentInfoDto.getJiraId(), issueCode);
         issueInfo.addComment(commentInfoDtoMapper.toCommentInfo(commentInfoDto));
         return issueInfoDtoMapper.toIssueInfoDto(issueRepository.save(issueInfo));
     }
